@@ -1,0 +1,32 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "lib": ["esnext", "dom", "webworker", "scripthost", "es2016"],
+        "pretty": true,
+        "newLine": "LF",
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
+        "sourceMap": false,
+        "allowJs": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": false,
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
+        "outDir": "dist",
+    },
+    "include": [
+        "src/*.ts",
+        "src/typings.ts",
+        "./node_modules/@types",
+    ],
+    "exclude": [
+      "./node_modules",
+      "./dist",
+    ]
+}

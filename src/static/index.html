@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <title>Snakee</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <meta name='theme-color' content='#071d2b'>
+    <meta name='description' content='Snake game'>
+    <link rel='manifest' href='/manifest.json'>
+    <meta http-equiv='Content-Security-Policy'
+        content="default-src 'self' https: 'unsafe-inline';
+        script-src 'self' 'unsafe-eval';
+        style-src 'unsafe-inline' http: https:;
+        media-src 'unsafe-inline' http: file:;"/>
+    <link rel='shortcut icon' href='./images/favicon.ico' sizes='256x256' />
+    <style>
+      html {
+        overflow: hidden;
+        background: #082538;
+      }
+
+      body {
+        margin: 0;
+        user-select: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100vh;
+        font-family: 'Josefin Sans', Helvetica sans-serif;
+      }
+      #splash-screen {
+        background: #071d2b;
+        height: 100%;
+        width: 100%;
+        z-index: 4;
+        position: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #splash-title {
+        font-size: 24px;
+        color: #fff;
+      }
+      #splash-snake {
+        height: 20px;
+        width: 100px;
+        background: #FF8C00;
+      }
+      html[loaded] #splash-screen {
+        display: none;
+      }
+    </style>
+    <link href='https://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet'>
+  <body>
+
+    <div id='splash-screen'>
+      <div>
+        <div id='splash-title'>Loading game</div>
+        <div id='splash-snake'></div>
+      </div>
+    </div>
+
+    <game-shell id='game'></game-shell>
+  </body>
+
+  <script type='module' src='./app.js'></script>
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "genpop-app",
+  "version": "0.9.9",
+  "description": "Gen pop",
+  "main": "main.js",
+  "scripts": {
+    "start": "node ./dist/main.js",
+    "compile-wasm": "emcc src/wasm/main.cpp -s -s WASM=1 -O1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s \"SDL2_IMAGE_FORMATS=['png']\" -s USE_SDL_TTF=2  -o dist/index.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
+    "server": "http-server ./dist",
+    "build": "rollup -c",
+    "watch": "rollup -cw"
+  },
+  "keywords": ["Snake", "Wasm", "C++"],
+  "author": "Justinas Delinda",
+  "license": "MIT",
+  "dependencies": {
+    "lit-element": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/emscripten": "0.0.31",
+    "@types/web-animations-js": "^2.2.7",
+    "rollup": "^1.6.0",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-copy-glob": "^0.3.0",
+    "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-typescript2": "^0.19.2",
+    "typescript": "^3.3"
+  }
+}
