@@ -8,14 +8,12 @@
 #include "snake.cpp"
 #include "food.cpp"
 
-Food food;
-Snake snake;
-
-class Game {
+class Painter {
   private:
+  SDL_Window *window = NULL;
+  SDL_Renderer *renderer = NULL;
 
-  int score = 0;
-
+  protected:
   double screenWidth = 500;
   double screenHeight = 500;
   int zoneSize = 50;
@@ -23,13 +21,13 @@ class Game {
   int rowCount = 20;
   int columnCount = 20;
   int offset = zoneSize / 100.0 * 20;
-  SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
-  SDL_Keycode direction = SDLK_RIGHT;
+
+  bool playing = true;
+
+  Snake snake;
+  Food food;
 
   public:
-  bool isGameOver = false;
-  bool playing = false;
 
 
   void initializeRender() {
@@ -68,51 +66,9 @@ class Game {
     }, rowCount, columnCount);
   }
 
-  void setScene() {
-    score = 0;
-    isGameOver = false;
-    snake.setStartingPosition();
-    food.getNewCoordinates(columnCount-1, rowCount-1);
-  }
-
-  void changeDirection(SDL_Keycode newDirection) {
-    direction = newDirection;
-  }
-
-  void logic() {
-    snake.setDirection(direction);
-    snake.move();
-    if (snake.checkIfItCollided() || snake.checkIfOutOfBounds(columnCount, rowCount)) {
-      isGameOver = true;
-      EM_ASM_({
-        document.getElementById('game').gameOver();
-      }, score);
-    }
-    Coordinate foodCoordinate = food.getCoordinates();
-    if (snake.eat(foodCoordinate)) {
-      auto snakePath = snake.getCoordinates();
-      foodCoordinate = food.getNewCoordinates(columnCount-1, rowCount-1);
-      bool foodSpawnedBehindSnake = true;
-      while(foodSpawnedBehindSnake) {
-        for (auto & it : snakePath) {
-          if (foodCoordinate == it) {
-            foodCoordinate = food.getNewCoordinates(columnCount-1, rowCount-1);
-            continue;
-          }
-        }
-        foodSpawnedBehindSnake = false;
-      }
-      score += 1;
-      EM_ASM_({
-        document.getElementById('game').setGameScore($0);
-      }, score);
-    }
-  }
-
   void draw() {
     if (!playing)
-      return;
-
+    return;
     drawBoard();
 
     // Draw snake

@@ -2,7 +2,7 @@
 #include <vector>
 
 #include <SDL2/SDL.h>
-#include "cordinate.cpp"
+#include "coordinate.cpp"
 
 class Snake {
   private:
@@ -23,19 +23,19 @@ class Snake {
     Coordinate startingCoordinate{.x = 5, .y = 5 };
     path.clear();
     path.push_back(startingCoordinate);
-    direction = SDLK_RIGHT;
     needsToGrow = false;
+    direction = SDLK_RIGHT;
   }
 
-  void changeDirection(SDL_Keycode newDirection) {
-    if ((path.size() > 0) && 
+  void setDirection(SDL_Keycode newDirection) {
+     if ((path.size() > 1) && 
        ((direction == SDLK_UP && newDirection == SDLK_DOWN) ||
         (direction == SDLK_DOWN && newDirection == SDLK_UP) ||
         (direction == SDLK_LEFT && newDirection == SDLK_RIGHT) ||
         (direction == SDLK_RIGHT && newDirection == SDLK_LEFT))) {
           return;
     }
-    this->direction = newDirection;
+    direction = newDirection;
   }
 
   void move() {

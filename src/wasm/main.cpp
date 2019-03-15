@@ -28,19 +28,19 @@ void setGameDirection() {
         switch (event.key.keysym.sym) {
           case SDLK_w:
           case SDLK_UP:
-            snake.changeDirection(SDLK_UP);
+            game.changeDirection(SDLK_UP);
             break;
           case SDLK_s:
           case SDLK_DOWN:
-            snake.changeDirection(SDLK_DOWN);
+            game.changeDirection(SDLK_DOWN);
             break;
           case SDLK_a:
           case SDLK_LEFT:
-            snake.changeDirection(SDLK_LEFT);
+            game.changeDirection(SDLK_LEFT);
             break;
           case SDLK_d:
           case SDLK_RIGHT:
-            snake.changeDirection(SDLK_RIGHT);
+            game.changeDirection(SDLK_RIGHT);
             break;
         }
         return;
@@ -48,9 +48,9 @@ void setGameDirection() {
         auto dx = event.tfinger.dx;
         auto dy = event.tfinger.dy;
         if (std::fabs(dx) > std::fabs(dy)) {
-          snake.changeDirection(dx > 0.00 ? SDLK_RIGHT : SDLK_LEFT);
+          game.changeDirection(dx > 0.00 ? SDLK_RIGHT : SDLK_LEFT);
         } else {
-          snake.changeDirection(dy > 0.00 ? SDLK_DOWN : SDLK_UP);
+          game.changeDirection(dy > 0.00 ? SDLK_DOWN : SDLK_UP);
         }
         // EM_ASM_({
         //   console.log($0, $1);
@@ -69,9 +69,8 @@ void main_tick() {
     return;
   }
 
-  setGameDirection();
-
   while (emscripten_get_now() > lastTickTime + TIME_PER_TICK) {
+      setGameDirection();
       game.logic();
       if (game.isGameOver) {
         game.playing = false;

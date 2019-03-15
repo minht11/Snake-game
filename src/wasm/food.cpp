@@ -1,6 +1,7 @@
 #include <random>
-#include "cordinate.cpp"
+#include "coordinate.cpp"
 
+#pragma once
 class Food {
   private:
   Coordinate f;
