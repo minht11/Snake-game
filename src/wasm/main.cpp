@@ -15,53 +15,53 @@ double TIME_PER_TICK = 160.0;
 double lastTickTime;
 double lastFrameTime;
 
-// void setGameDirection() {
-//   SDL_Event event;
-//   while (SDL_PollEvent(&event)) {
-//     switch (event.type) {
-//       case SDL_QUIT:
-//         quit = 1;
-//         break;
+void setGameDirection() {
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+      case SDL_QUIT:
+        quit = 1;
+        break;
     
-//       case SDL_KEYDOWN:
-//         switch (event.key.keysym.sym) {
-//           case SDLK_w:
-//           case SDLK_UP:
-//             game.changeDirection(SDLK_UP);
-//             break;
-//           case SDLK_s:
-//           case SDLK_DOWN:
-//             game.changeDirection(SDLK_DOWN);
-//             break;
-//           case SDLK_a:
-//           case SDLK_LEFT:
-//             game.changeDirection(SDLK_LEFT);
-//             break;
-//           case SDLK_d:
-//           case SDLK_RIGHT:
-//             game.changeDirection(SDLK_RIGHT);
-//             break;
-//         }
-//         return;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+          case SDLK_w:
+          case SDLK_UP:
+            game.changeDirection(SDLK_UP);
+            break;
+          case SDLK_s:
+          case SDLK_DOWN:
+            game.changeDirection(SDLK_DOWN);
+            break;
+          case SDLK_a:
+          case SDLK_LEFT:
+            game.changeDirection(SDLK_LEFT);
+            break;
+          case SDLK_d:
+          case SDLK_RIGHT:
+            game.changeDirection(SDLK_RIGHT);
+            break;
+        }
+        return;
 
-//       case SDL_FINGERMOTION:
-//         auto dx = event.tfinger.dx;
-//         auto dy = event.tfinger.dy;
-//         if (std::fabs(dx) > std::fabs(dy)) {
-//           game.changeDirection(dx > 0.00 ? SDLK_RIGHT : SDLK_LEFT);
-//         } else {
-//           game.changeDirection(dy > 0.00 ? SDLK_DOWN : SDLK_UP);
-//         }
-//         // EM_ASM_({
-//         //   console.log($0, $1);
-//         // }, event.tfinger.dx, event.tfinger.dy);
-//           // EM_ASM_({
-//           //   console.log("touch");
-//           // });
-//         break;
-//     }
-//   }
-// }
+      case SDL_FINGERMOTION:
+        auto dx = event.tfinger.dx;
+        auto dy = event.tfinger.dy;
+        if (std::fabs(dx) > std::fabs(dy)) {
+          game.changeDirection(dx > 0.00 ? SDLK_RIGHT : SDLK_LEFT);
+        } else {
+          game.changeDirection(dy > 0.00 ? SDLK_DOWN : SDLK_UP);
+        }
+        // EM_ASM_({
+        //   console.log($0, $1);
+        // }, event.tfinger.dx, event.tfinger.dy);
+          // EM_ASM_({
+          //   console.log("touch");
+          // });
+        break;
+    }
+  }
+}
 
 void main_tick() {
   if (!game.isInitialized) {
@@ -74,7 +74,7 @@ void main_tick() {
   }
 
   while (emscripten_get_now() > lastTickTime + TIME_PER_TICK) {
-    // setGameDirection();
+    setGameDirection();
     game.logic();
     if (game.isGameOver) {
       game.playing = false;
