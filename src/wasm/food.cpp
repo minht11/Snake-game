@@ -15,9 +15,6 @@ class Food {
   // }
 
   int getRandomNumber(int max) {
-            EM_ASM_({
-            console.log("random");
-          });
     return EM_ASM_({
       return Math.floor(Math.random() * Math.floor($0));
     }, max);

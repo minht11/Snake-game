@@ -22,16 +22,20 @@ class Game {
   int minimumZoneCount = 20;
   int rowCount = 20;
   int columnCount = 20;
+  double wallXSize = 10;
+  double wallYSize = 10;
   double perspectiveDistance = zoneSize / 100.0 * 20;
   SDL_Window *window = NULL;
   SDL_Renderer *renderer = NULL;
   SDL_Keycode direction = SDLK_RIGHT;
 
   public:
+  bool isInitialized = false;
   bool isGameOver = false;
   bool playing = false;
 
-  void initializeRender() {
+  void initialize() {
+    isInitialized = true;
     SDL_Init(SDL_INIT_VIDEO);
 
     window = SDL_CreateWindow(
@@ -48,6 +52,7 @@ class Game {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+    isInitialized = false;
   }
 
   void resize(double w, double h) {
@@ -55,16 +60,18 @@ class Game {
     screenHeight = h;
     zoneSize = (w > h ? h : w) / minimumZoneCount;
   
-    rowCount = h / zoneSize;
-    columnCount = w / zoneSize;
+    // Size - minimum wall size.
+    double wAdjusted = w - 10 * 2;
+    double hAdjusted = h - 10 * 2;
+
+    rowCount = hAdjusted / zoneSize;
+    columnCount = wAdjusted / zoneSize;
     perspectiveDistance = zoneSize / 100.0 * 20;
+    wallXSize = (screenWidth - columnCount * zoneSize) / 2.0;
+    wallYSize = (screenHeight - rowCount * zoneSize) / 2.0;
 
     SDL_SetWindowSize(window, w, h);
     drawBoard();
-
-    EM_ASM({
-      console.log($0, $1);
-    }, rowCount, columnCount);
   }
 
   void setScene() {
@@ -110,6 +117,14 @@ class Game {
     }
   }
 
+  int getPositionX(int coordinateX) {
+    return coordinateX * zoneSize + wallXSize;
+  }
+
+  int getPositionY(int coordinateY) {
+    return coordinateY * zoneSize + wallYSize;
+  }
+
   void draw() {
     if (!playing)
       return;
@@ -122,21 +137,45 @@ class Game {
   }
 
   void drawBoard() {
+    
     // Draw solid background
     SDL_SetRenderDrawColor(renderer, 0x08, 0x25, 0x38, 0xFF); // #082538
     SDL_RenderClear(renderer);
 
+    // Draw walls
+    SDL_SetRenderDrawColor(renderer, 0x04, 0x14, 0x1f, 0xFF); // #04141f
+    SDL_Rect wallRect;
+    // Left
+    wallRect.w = wallXSize;
+    wallRect.h = screenHeight;
+    wallRect.x = 0;
+    wallRect.y = 0;
+    SDL_RenderFillRect(renderer, &wallRect);
+    // Right
+    wallRect.x = screenWidth - wallXSize;
+    SDL_RenderFillRect(renderer, &wallRect);
+    // Top
+    wallRect.w = screenWidth;
+    wallRect.h = wallYSize;
+    wallRect.x = 0;
+    wallRect.y = 0;
+    SDL_RenderFillRect(renderer, &wallRect);
+    // Bottom
+    wallRect.y = screenHeight - wallYSize;
+    SDL_RenderFillRect(renderer, &wallRect);
+
+    // Draw checkboxes
     SDL_SetRenderDrawColor(renderer, 0x0a, 0x2c, 0x42, 0xFF); // #0a2c42
     int col = round(columnCount / 2.0);
-    SDL_Rect ckeckbox;
-    ckeckbox.h = zoneSize;
-    ckeckbox.w = zoneSize;
+    SDL_Rect checkboxRect;
+    checkboxRect.h = zoneSize;
+    checkboxRect.w = zoneSize;
     for (size_t i = 0; i < rowCount; i++) {
       for (size_t j = 0; j < col; j++) {
         if (!(col * 2 > columnCount && j == col - 1 && i % 2 == 0)) {
-          ckeckbox.x = 2 * j * zoneSize + (i % 2 ? 0 : zoneSize);
-          ckeckbox.y = i * zoneSize;
-          SDL_RenderFillRect(renderer, &ckeckbox);
+          checkboxRect.x = 2 * j * zoneSize + (i % 2 ? 0 : zoneSize) + wallXSize;
+          checkboxRect.y = i * zoneSize + wallYSize;
+          SDL_RenderFillRect(renderer, &checkboxRect);
         }
       }
     }
@@ -159,8 +198,8 @@ class Game {
         SDL_SetRenderDrawColor(renderer, 0x00, 0xCC, 0x6A, 0xFF); // #00CC6A
       }
 
-      foodRect.x = foodCoordinate.x * zoneSize + foodOffset;
-      foodRect.y = foodCoordinate.y * zoneSize + foodOffset - distance;
+      foodRect.x = getPositionX(foodCoordinate.x) + foodOffset;
+      foodRect.y = getPositionY(foodCoordinate.y) + foodOffset - distance;
       SDL_RenderDrawRect(renderer, &foodRect);
     };
     foodLambada(true);
@@ -182,8 +221,8 @@ class Game {
       }
 
       for (auto & it : snakePath) {
-        snakeRect.x = zoneSize * it.x;
-        snakeRect.y = zoneSize * it.y - distance;
+        snakeRect.x = getPositionX(it.x);
+        snakeRect.y = getPositionY(it.y) - distance;
         SDL_RenderDrawRect(renderer, &snakeRect);
       };
     };
@@ -192,9 +231,9 @@ class Game {
 
     // Draw snakes head
     auto snakeHeadCoord = snake.getHeadCoordinate();
-    SDL_SetRenderDrawColor(renderer, 0xDA, 0x3B, 0x01, 0xFF); // #DA3B01
-    snakeRect.x = zoneSize * snakeHeadCoord.x;
-    snakeRect.y = zoneSize * snakeHeadCoord.y;
+    SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
+    snakeRect.x = getPositionX(snakeHeadCoord.x);
+    snakeRect.y = getPositionY(snakeHeadCoord.y);
     SDL_RenderFillRect(renderer, &snakeRect);
 
     SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00

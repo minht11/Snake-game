@@ -1,7 +1,6 @@
 import typescript from 'rollup-plugin-typescript2'
 import copy from 'rollup-plugin-copy-glob'
 import nodeResolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
 
 const mainOptions = {
   input: 'src/app.ts',
@@ -16,9 +15,6 @@ const mainOptions = {
     nodeResolve({
       jsnext: true,
       extensions: [ '.ts', '.js', '.json' ]
-    }),
-    commonjs({
-      sourceMap: false
     }),
     typescript({
       typescript: require("typescript"),

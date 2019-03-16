@@ -93,7 +93,6 @@ input[type=radio]:checked ~ label {
   width: 100%;
   height: calc(100% - 56px);
   box-sizing: border-box;
-  padding: 24px;
 }
 
 .action-button {
@@ -113,7 +112,6 @@ input[type=radio]:checked ~ label {
 .action-button:hover {
   border-bottom: 2px solid #FF8C00;
   background: #F7630C;
-
 }
 
 #resume-game-countdown-container {
