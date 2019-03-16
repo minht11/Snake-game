@@ -62,7 +62,7 @@ class Game {
     SDL_SetWindowSize(window, w, h);
     drawBoard();
 
-    EM_ASM_({
+    EM_ASM({
       console.log($0, $1);
     }, rowCount, columnCount);
   }
@@ -84,7 +84,7 @@ class Game {
     snake.move();
     if (snake.checkIfItCollided() || snake.checkIfOutOfBounds(columnCount, rowCount)) {
       isGameOver = true;
-      EM_ASM_({
+      EM_ASM({
         document.getElementById('game').gameOver();
       }, score);
     }
@@ -104,7 +104,7 @@ class Game {
         foodSpawnedBehindSnake = false;
       }
       score += 1;
-      EM_ASM_({
+      EM_ASM({
         document.getElementById('game').setGameScore($0);
       }, score);
     }

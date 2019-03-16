@@ -1,7 +1,7 @@
 const CACHE_NAME = 'snake-game-cache-v1'
 const urlsToCache = [
   '/',
-  '/index.wasm',
+  '/game.wasm',
   '/index.js',
   '/app.js',
 ]

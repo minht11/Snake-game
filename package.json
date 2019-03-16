@@ -5,12 +5,16 @@
   "main": "main.js",
   "scripts": {
     "start": "node ./dist/main.js",
-    "compile-wasm": "emcc src/wasm/main.cpp -s -s WASM=1 -O1 -s USE_SDL=2 -o dist/index.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
+    "compile-wasm": "emcc src/wasm/main.cpp -s ASSERTIONS=1 -s WASM=1 -O1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
     "server": "http-server ./dist",
     "build": "rollup -c",
     "watch": "rollup -cw"
   },
-  "keywords": ["Snake", "Wasm", "C++"],
+  "keywords": [
+    "Snake",
+    "Wasm",
+    "C++"
+  ],
   "author": "Justinas Delinda",
   "license": "MIT",
   "dependencies": {

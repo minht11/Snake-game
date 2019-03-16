@@ -32,6 +32,7 @@ const mainOptions = {
     ],
     { verbose: false, watch: true }),
   ],
+  external: ['./game.js'],
   experimentalCodeSplitting: true
 }
 

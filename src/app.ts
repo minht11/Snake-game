@@ -2,10 +2,15 @@
 import { LitElement, customElement, property, html } from 'lit-element'
 import { appStyles } from './app-styles'
 import { GamePopup } from './game-popup'
+// @ts-ignore file generated using Emscripten 
+import game from './game.js'
+
 import './game-popup'
 
 @customElement('game-shell' as any)
 export class GameShell extends LitElement {
+  gameRenderer!: any
+  
   @property()
   isGamePlaying = false
 
@@ -138,22 +143,18 @@ export class GameShell extends LitElement {
   async setupGameRenderer() {
     const canvas = <HTMLCanvasElement>this.shadowRoot!.getElementById('game-renderer')
     
-    const response = await fetch('index.wasm')
+    const response = await fetch('game.wasm')
     const buffer = await response.arrayBuffer()
 
-    //@ts-ignore
-    window.Module = {
+    const options = {
       canvas: canvas,
       wasmBinary: buffer,
-      onRuntimeInitialized: () => {
-        this.setupResizeObserver(canvas)
-        document.documentElement.setAttribute('loaded', '')
-      }
     }
-    
-    const script = document.createElement('script')
-    script.src = 'index.js'
-    document.body.appendChild(script)
+
+    this.gameRenderer = game(options).then(() => {
+      this.setupResizeObserver(canvas)
+      document.documentElement.setAttribute('loaded', '')
+    })
   }
 
   setupResizeObserver(canvas) {
@@ -161,16 +162,15 @@ export class GameShell extends LitElement {
     const setSize = ({ width, height }) => {
       canvas.width = width
       canvas.height = height
-      Module.ccall('resizeGame', 'void', ['number', 'number'], [width, height])
+      this.gameRenderer.ccall('resizeGame', 'void', ['number', 'number'], [width, height])
     }
 
     if ('ResizeObserver' in window) {
       // @ts-ignore
-      const resizeObserver = new ResizeObserver((entries) => {
-        for (let entry of entries) {
-          setSize(entry.contentRect)
-        }
-      })
+      const resizeObserver = new ResizeObserver((entries) =>
+        entries.forEach(({ contentRect }) => setSize(contentRect))
+      )
+
       resizeObserver.observe(canvas)
     } else {
       setSize(canvas.getBoundingClientRect())
@@ -179,11 +179,12 @@ export class GameShell extends LitElement {
   }
 
   async pauseGame() {
-    if (this.isGamePaused) return;
-    // @ts-ignore
-    Module.ccall('pauseGame', 'void')
+    if (this.isGamePaused)
+      return
+
+    this.gameRenderer.ccall('pauseGame', 'void')
     this.isGamePaused = true
-    await this.updateComplete;
+    await this.updateComplete
     const popup = <GamePopup>this.shadowRoot!.getElementById('game-paused-popup')
     popup.openPopup()
   }
@@ -196,8 +197,7 @@ export class GameShell extends LitElement {
     setTimeout(() => {
       this.isGamePaused = false
       countDownElement.removeAttribute('start')
-      // @ts-ignore
-      Module.ccall('resumeGame', 'void')
+      this.gameRenderer.ccall('resumeGame', 'void')
     }, 3000)
   }
 
@@ -209,8 +209,7 @@ export class GameShell extends LitElement {
     this.isGameOver = false
     this.isGamePaused = false
     this.isNewBestScore = false
-    // @ts-ignore
-    Module.ccall('playGame', 'void')
+    this.gameRenderer.ccall('playGame', 'void')
   }
 
   async gameOver() {
@@ -228,7 +227,7 @@ export class GameShell extends LitElement {
     const selector = path[2]
     const item = path[1]
     this.gameMode = Array.from(selector.children).indexOf(item) as 0 | 1 | 2
-    Module.ccall('setGameMode', 'void', ['number'], [this.gameMode])
+    this.gameRenderer.ccall('setGameMode', 'void', ['number'], [this.gameMode])
   }
 
   setGameScore(score) {

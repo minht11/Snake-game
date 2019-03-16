@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <cmath>
 
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
@@ -123,6 +124,9 @@ extern "C" {
     game.setScene();
     game.playing = true;
     emscripten_resume_main_loop();
+    EM_ASM({
+      console.log("1");
+    });
   }
 
 }
