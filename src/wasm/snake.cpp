@@ -11,7 +11,7 @@ class Snake {
   SDL_Keycode direction;
 
   public:
-  Coordinate getLastCoordinate() {
+  Coordinate getHeadCoordinate() {
     return path.back();
   }
 
@@ -24,7 +24,6 @@ class Snake {
     path.clear();
     path.push_back(startingCoordinate);
     needsToGrow = false;
-    direction = SDLK_RIGHT;
   }
 
   void setDirection(SDL_Keycode newDirection) {
@@ -39,28 +38,28 @@ class Snake {
   }
 
   void move() {
-    Coordinate lastCoordinate = getLastCoordinate();
-    Coordinate newCoordinate;
+    Coordinate headCoordinate = getHeadCoordinate();
+    Coordinate newHeadCoordinate;
 
     switch(direction) {
       case SDLK_LEFT:
-        newCoordinate.x = lastCoordinate.x - 1;
-        newCoordinate.y = lastCoordinate.y;
+        newHeadCoordinate.x = headCoordinate.x - 1;
+        newHeadCoordinate.y = headCoordinate.y;
         break;
       case SDLK_RIGHT:
-        newCoordinate.x = lastCoordinate.x + 1;
-        newCoordinate.y = lastCoordinate.y;
+        newHeadCoordinate.x = headCoordinate.x + 1;
+        newHeadCoordinate.y = headCoordinate.y;
         break;
       case SDLK_UP:
-        newCoordinate.x = lastCoordinate.x;
-        newCoordinate.y = lastCoordinate.y - 1;
+        newHeadCoordinate.x = headCoordinate.x;
+        newHeadCoordinate.y = headCoordinate.y - 1;
         break;
       case SDLK_DOWN:
-        newCoordinate.x = lastCoordinate.x;
-        newCoordinate.y = lastCoordinate.y + 1;
+        newHeadCoordinate.x = headCoordinate.x;
+        newHeadCoordinate.y = headCoordinate.y + 1;
         break;
     }
-    path.push_back(newCoordinate);
+    path.push_back(newHeadCoordinate);
 
     if (needsToGrow) {
       needsToGrow = false;
@@ -70,7 +69,7 @@ class Snake {
   }
 
   bool eat(Coordinate foodCoordinate) {
-    Coordinate headCoordinate = getLastCoordinate();
+    Coordinate headCoordinate = getHeadCoordinate();
 
     needsToGrow = headCoordinate == foodCoordinate;
     return needsToGrow;
@@ -80,11 +79,11 @@ class Snake {
     if (path.size() == 1)
       return false;
 
-    Coordinate lastCoordinate = getLastCoordinate();
+    Coordinate headCoordinate = getHeadCoordinate();
     int i = 0;
     int size = path.size();
     for (auto & it : path) {
-      if (it == lastCoordinate && size-1 != i) {
+      if (it == headCoordinate && size-1 != i) {
         return true;
       }
       i += 1;
@@ -93,8 +92,8 @@ class Snake {
   }
 
   bool checkIfOutOfBounds(int boundaryX, int boundaryY) {
-    Coordinate lastCoordinate = getLastCoordinate();
-    return lastCoordinate.x == -1 || lastCoordinate.y == -1 ||
-          lastCoordinate.x == boundaryX || lastCoordinate.y == boundaryY;
+    Coordinate headCoordinate = getHeadCoordinate();
+    return headCoordinate.x == -1 || headCoordinate.y == -1 ||
+          headCoordinate.x == boundaryX || headCoordinate.y == boundaryY;
   }
 };

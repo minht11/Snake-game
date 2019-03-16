@@ -44,6 +44,7 @@ void setGameDirection() {
             break;
         }
         return;
+
       case SDL_FINGERMOTION:
         auto dx = event.tfinger.dx;
         auto dy = event.tfinger.dy;
@@ -70,12 +71,12 @@ void main_tick() {
   }
 
   while (emscripten_get_now() > lastTickTime + TIME_PER_TICK) {
-      setGameDirection();
-      game.logic();
-      if (game.isGameOver) {
-        game.playing = false;
-      }
-      lastTickTime += TIME_PER_TICK;
+    setGameDirection();
+    game.logic();
+    if (game.isGameOver) {
+      game.playing = false;
+    }
+    lastTickTime += TIME_PER_TICK;
   }
   lastFrameTime = emscripten_get_now();
   game.draw();
@@ -92,10 +93,10 @@ extern "C" {
   void setGameMode(int type = 1) {
     switch(type) {
       case 0:
-        TIME_PER_TICK = 240.0;
+        TIME_PER_TICK = 220.0;
         break;
       case 1:
-        TIME_PER_TICK = 140.0;
+        TIME_PER_TICK = 128.0;
         break;
       case 2:
         TIME_PER_TICK = 80.0;

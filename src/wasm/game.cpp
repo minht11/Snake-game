@@ -22,7 +22,7 @@ class Game {
   int minimumZoneCount = 20;
   int rowCount = 20;
   int columnCount = 20;
-  int offset = zoneSize / 100.0 * 20;
+  double perspectiveDistance = zoneSize / 100.0 * 20;
   SDL_Window *window = NULL;
   SDL_Renderer *renderer = NULL;
   SDL_Keycode direction = SDLK_RIGHT;
@@ -30,7 +30,6 @@ class Game {
   public:
   bool isGameOver = false;
   bool playing = false;
-
 
   void initializeRender() {
     SDL_Init(SDL_INIT_VIDEO);
@@ -58,7 +57,7 @@ class Game {
   
     rowCount = h / zoneSize;
     columnCount = w / zoneSize;
-    offset = zoneSize / 100.0 * 20;
+    perspectiveDistance = zoneSize / 100.0 * 20;
 
     SDL_SetWindowSize(window, w, h);
     drawBoard();
@@ -71,8 +70,9 @@ class Game {
   void setScene() {
     score = 0;
     isGameOver = false;
+    direction = SDLK_RIGHT;
     snake.setStartingPosition();
-    food.getNewCoordinates(columnCount-1, rowCount-1);
+    food.generateNewCoordinate(columnCount-1, rowCount-1);
   }
 
   void changeDirection(SDL_Keycode newDirection) {
@@ -91,12 +91,13 @@ class Game {
     Coordinate foodCoordinate = food.getCoordinates();
     if (snake.eat(foodCoordinate)) {
       auto snakePath = snake.getCoordinates();
-      foodCoordinate = food.getNewCoordinates(columnCount-1, rowCount-1);
+      foodCoordinate = food.generateNewCoordinate(columnCount-1, rowCount-1);
+
       bool foodSpawnedBehindSnake = true;
       while(foodSpawnedBehindSnake) {
         for (auto & it : snakePath) {
           if (foodCoordinate == it) {
-            foodCoordinate = food.getNewCoordinates(columnCount-1, rowCount-1);
+            foodCoordinate = food.generateNewCoordinate(columnCount-1, rowCount-1);
             continue;
           }
         }
@@ -114,44 +115,7 @@ class Game {
       return;
 
     drawBoard();
-
-    // Draw snake
-    auto snakeC = snake.getCoordinates();
-    SDL_Rect snakeRect;
-    SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
-    // SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00
-    for (auto & it : snakeC) {
-      snakeRect.x = zoneSize * it.x;
-      snakeRect.y = zoneSize * it.y;
-      snakeRect.h = zoneSize;
-      snakeRect.w = zoneSize;
-      SDL_RenderFillRect(renderer, &snakeRect);
-    }
-
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00
-    for (auto & it : snakeC) {
-      snakeRect.x = zoneSize * it.x;
-      snakeRect.y = zoneSize * it.y - offset;
-      snakeRect.h = zoneSize;
-      snakeRect.w = zoneSize;
-      SDL_RenderFillRect(renderer, &snakeRect);
-    }
-
-    // Draw snakes head
-    SDL_SetRenderDrawColor(renderer, 0xDA, 0x3B, 0x01, 0xFF); // #DA3B01
-    auto snakeHeadC = snake.getLastCoordinate();
-    SDL_Rect snakeHeadRect;
-    snakeHeadRect.x = zoneSize * snakeHeadC.x;
-    snakeHeadRect.y = zoneSize * snakeHeadC.y; 
-    snakeHeadRect.w = zoneSize;
-    snakeHeadRect.h = zoneSize;
-    // SDL_RenderFillRect(renderer, &snakeHeadRect);
-
-    // SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
-    snakeHeadRect.y = snakeHeadRect.y - offset;
-    SDL_RenderFillRect(renderer, &snakeHeadRect);
-
-    drawFood(true);
+    drawSnake();
     drawFood();
     
     SDL_RenderPresent(renderer);
@@ -165,55 +129,76 @@ class Game {
     SDL_SetRenderDrawColor(renderer, 0x0a, 0x2c, 0x42, 0xFF); // #0a2c42
     int col = round(columnCount / 2.0);
     SDL_Rect ckeckbox;
+    ckeckbox.h = zoneSize;
+    ckeckbox.w = zoneSize;
     for (size_t i = 0; i < rowCount; i++) {
       for (size_t j = 0; j < col; j++) {
         if (!(col * 2 > columnCount && j == col - 1 && i % 2 == 0)) {
           ckeckbox.x = 2 * j * zoneSize + (i % 2 ? 0 : zoneSize);
           ckeckbox.y = i * zoneSize;
-          ckeckbox.h = zoneSize;
-          ckeckbox.w = zoneSize;
           SDL_RenderFillRect(renderer, &ckeckbox);
         }
       }
     }
   }
 
-  void drawFood(bool shadow = false) {
-    int dist = offset / 2.0;
-    
-    if (shadow) {
-      dist = 0;
-      SDL_SetRenderDrawColor(renderer, 0x10, 0x89, 0x3E, 0xFF); // #10893E
-    } else {
-      SDL_SetRenderDrawColor(renderer, 0x00, 0xCC, 0x6A, 0xFF); // #00CC6A
-    }
-
-
+  void drawFood() {
     Coordinate foodCoordinate = food.getCoordinates();
-    int foodSize = (zoneSize - offset * 2) / 3;
+    double foodSize = zoneSize - 2.0 * perspectiveDistance;
+    double foodOffset = (zoneSize - foodSize) / 2.0;
 
-    SDL_Rect foodPart;
-    foodPart.h = foodSize;
-    foodPart.w = foodSize;
+    SDL_Rect foodRect;
+    foodRect.h = foodSize;
+    foodRect.w = foodSize;
+    auto foodLambada = [&](bool perspective = false) -> void {
+      double distance = 0;
+      if (perspective) {
+        SDL_SetRenderDrawColor(renderer, 0x10, 0x89, 0x3E, 0xFF); // #10893E
+      } else {
+        distance = perspectiveDistance;
+        SDL_SetRenderDrawColor(renderer, 0x00, 0xCC, 0x6A, 0xFF); // #00CC6A
+      }
 
-    // Left
-    foodPart.x = foodCoordinate.x * zoneSize + offset;
-    foodPart.y = foodCoordinate.y * zoneSize + foodSize + offset - dist;
-    SDL_RenderFillRect(renderer, &foodPart);
-  
-    // Right
-    foodPart.x = foodCoordinate.x * zoneSize + offset + foodSize * 2;
-    foodPart.y = foodCoordinate.y * zoneSize + foodSize + offset - dist;
-    SDL_RenderFillRect(renderer, &foodPart);
+      foodRect.x = foodCoordinate.x * zoneSize + foodOffset;
+      foodRect.y = foodCoordinate.y * zoneSize + foodOffset - distance;
+      SDL_RenderDrawRect(renderer, &foodRect);
+    };
+    foodLambada(true);
+    foodLambada();
+  }
 
-    // Top
-    foodPart.x = foodCoordinate.x * zoneSize + foodSize + offset;
-    foodPart.y = foodCoordinate.y * zoneSize + offset - dist;
-    SDL_RenderFillRect(renderer, &foodPart);
+  void drawSnake() {
+    auto snakePath = snake.getCoordinates();
+    SDL_Rect snakeRect;
+    snakeRect.h = zoneSize;
+    snakeRect.w = zoneSize;
+    auto snakeLambada = [&](bool perspective = false) -> void {
+      double distance = 0;
+      if (perspective) {
+        SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
+      } else {
+        distance = perspectiveDistance;
+        SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00
+      }
 
-    // Bottom
-    foodPart.x = foodCoordinate.x * zoneSize + foodSize + offset;
-    foodPart.y = foodCoordinate.y * zoneSize + offset + foodSize * 2 - dist;
-    SDL_RenderFillRect(renderer, &foodPart);
+      for (auto & it : snakePath) {
+        snakeRect.x = zoneSize * it.x;
+        snakeRect.y = zoneSize * it.y - distance;
+        SDL_RenderDrawRect(renderer, &snakeRect);
+      };
+    };
+    snakeLambada(true);
+    snakeLambada();
+
+    // Draw snakes head
+    auto snakeHeadCoord = snake.getHeadCoordinate();
+    SDL_SetRenderDrawColor(renderer, 0xDA, 0x3B, 0x01, 0xFF); // #DA3B01
+    snakeRect.x = zoneSize * snakeHeadCoord.x;
+    snakeRect.y = zoneSize * snakeHeadCoord.y;
+    SDL_RenderFillRect(renderer, &snakeRect);
+
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00
+    snakeRect.y = snakeRect.y - perspectiveDistance;
+    SDL_RenderFillRect(renderer, &snakeRect);
   }
 };

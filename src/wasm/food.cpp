@@ -18,7 +18,7 @@ class Food {
     return f;
   }
   
-  Coordinate getNewCoordinates(int boundX, int boundY) {
+  Coordinate generateNewCoordinate(int boundX, int boundY) {
     f.x = getRandomNumber(0, boundX);
     f.y = getRandomNumber(0, boundY);
     return f;

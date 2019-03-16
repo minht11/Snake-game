@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "node ./dist/main.js",
-    "compile-wasm": "emcc src/wasm/main.cpp -s -s WASM=1 -O1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s \"SDL2_IMAGE_FORMATS=['png']\" -s USE_SDL_TTF=2  -o dist/index.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
+    "compile-wasm": "emcc src/wasm/main.cpp -s -s WASM=1 -O1 -s USE_SDL=2 -o dist/index.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
     "server": "http-server ./dist",
     "build": "rollup -c",
     "watch": "rollup -cw"
