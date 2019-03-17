@@ -1,57 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include <math.h>
 
 #include <SDL2/SDL.h>
 
 #include "snake.cpp"
 #include "food.cpp"
+#include "painter.cpp"
 
 Food food;
 Snake snake;
 
-class Game {
+class Game : public Painter {
   private:
 
   int score = 0;
-
-  double screenWidth = 500;
-  double screenHeight = 500;
-  int zoneSize = 50;
-  int minimumZoneCount = 20;
-  int rowCount = 20;
-  int columnCount = 20;
-  double wallXSize = 10;
-  double wallYSize = 10;
-  double perspectiveDistance = zoneSize / 100.0 * 20;
-  SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
   SDL_Keycode direction = SDLK_RIGHT;
 
   public:
   bool isInitialized = false;
-  bool isGameOver = false;
   bool playing = false;
 
   void initialize() {
+    Painter::initialize();
     isInitialized = true;
-    SDL_Init(SDL_INIT_VIDEO);
-
-    window = SDL_CreateWindow(
-      "Snakee",
-      SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-      screenWidth, screenHeight,
-      SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     drawBoard();
   }
 
   void clearRenderer() {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    Painter::clearRenderer();
     isInitialized = false;
   }
 
@@ -76,7 +53,6 @@ class Game {
 
   void setScene() {
     score = 0;
-    isGameOver = false;
     direction = SDLK_RIGHT;
     snake.setStartingPosition();
     food.generateNewCoordinate(columnCount-1, rowCount-1);
@@ -89,11 +65,11 @@ class Game {
   void logic() {
     snake.setDirection(direction);
     snake.move();
-    if (snake.checkIfItCollided() || snake.checkIfOutOfBounds(columnCount, rowCount)) {
-      isGameOver = true;
+    if (snake.didCollideWithItself() || snake.isItOutOfBounds(columnCount, rowCount)) {
+      playing = false;
       EM_ASM({
         document.getElementById('game')['gameOver']();
-      }, score);
+      });
     }
     Coordinate foodCoordinate = food.getCoordinates();
     if (snake.eat(foodCoordinate)) {

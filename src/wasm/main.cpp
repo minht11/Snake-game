@@ -4,8 +4,6 @@
 #include "game.cpp"
 #include "input/input.cpp"
 
-static int quit = 0;
-
 Game game;
 Input input;
 
@@ -30,9 +28,6 @@ void main_tick() {
   while (emscripten_get_now() > lastTickTime + TIME_PER_TICK) {
     game.changeDirection(input.getDirection());
     game.logic();
-    if (game.isGameOver) {
-      game.playing = false;
-    }
     lastTickTime += TIME_PER_TICK;
   }
   lastFrameTime = emscripten_get_now();

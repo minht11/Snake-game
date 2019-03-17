@@ -75,7 +75,7 @@ class Snake {
     return needsToGrow;
   }
 
-  bool checkIfItCollided() {
+  bool didCollideWithItself() {
     if (path.size() == 1)
       return false;
 
@@ -91,7 +91,7 @@ class Snake {
     return false;
   }
 
-  bool checkIfOutOfBounds(int boundaryX, int boundaryY) {
+  bool isItOutOfBounds(int boundaryX, int boundaryY) {
     Coordinate headCoordinate = getHeadCoordinate();
     return headCoordinate.x == -1 || headCoordinate.y == -1 ||
           headCoordinate.x == boundaryX || headCoordinate.y == boundaryY;
