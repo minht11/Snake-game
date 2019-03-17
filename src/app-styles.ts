@@ -48,21 +48,17 @@ export const appStyles = [css`
   border-radius: 50%;
   margin-left: auto;
   cursor: pointer;
+  border: none;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .icon-button svg {
   height: 30px;
   width: 30px;
   fill: #fff;
-}
-
-button {
-  padding: 0;
-  border: none;
-  font: inherit;
-  color: #fff;
-  font-weight: 600;
-  font-size: 18px;
-  background: transparent;
 }
 
 #game-mode-selector {
@@ -89,29 +85,24 @@ input[type=radio]:checked ~ label {
   color: #0DFF92;
 }
 
+.action-button {
+  font-size: 14px;
+  background: #FF8C00;
+  border-bottom: 2px solid #F7630C;
+  height: 48px;
+  padding: 0 36px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.action-button:hover {
+  border-bottom: 2px solid #FF8C00;
+  background: #F7630C;
+}
+
 #game-renderer {
   width: 100%;
   height: calc(100% - 56px);
   box-sizing: border-box;
-}
-
-.action-button {
-  background: #FF8C00;
-  width: fit-content;
-  height: 48px;
-  padding: 0 36px;
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-transform: uppercase;
-  border-bottom: 2px solid #F7630C;
-  box-sizing: border-box;
-}
-
-.action-button:hover {
-  border-bottom: 2px solid #FF8C00;
-  background: #F7630C;
 }
 
 #resume-game-countdown-container {
@@ -170,3 +161,32 @@ input[type=radio]:checked ~ label {
   display: none;
 } 
 `]
+
+export const buttonStyles = css`
+.button {
+  background: transparent;
+  width: auto;
+  width: fit-content;
+  padding: 0 8px;
+  height: 36px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  border: none;
+  font: inherit;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color .2s, border-color .2s;
+}
+
+.button[outline] {
+  border: 2px solid #FF8C00;
+}
+
+.button:hover {
+  background: rgba(255,255,255,.1);
+}
+`

@@ -1,11 +1,12 @@
 
 import { LitElement, customElement, property, html } from 'lit-element'
-import { appStyles } from './app-styles'
+import { appStyles, buttonStyles } from './app-styles'
 import { GamePopup } from './game-popup'
 // @ts-ignore file generated using Emscripten 
 import game from './game.js'
 
 import './game-popup'
+import './app-update-toast'
 
 @customElement('game-shell' as any)
 export class GameShell extends LitElement {
@@ -49,7 +50,7 @@ export class GameShell extends LitElement {
   }
 
   static get styles() {
-    return appStyles
+    return [buttonStyles, appStyles]
   }
 
   render() {
@@ -57,7 +58,7 @@ export class GameShell extends LitElement {
     const pausedPopup = html`
       <game-popup id='game-paused-popup'>
         <div class='popup-title' slot='popup-title'>Game paused</div>
-        <button class='action-button' @click=${this.resumeGame}>Resume</button>
+        <button class='button action-button' @click=${this.resumeGame}>Resume</button>
       </game-popup>
       <div id='resume-game-countdown-container' count>
         <div id='resume-game-countdown'>
@@ -117,7 +118,7 @@ export class GameShell extends LitElement {
             <label for='game-fast'>Fast</label>
           </div>
         </div>
-        <button class='action-button' @click=${this.playGame}>Play <span ?hidden=${!this.isGameOver}>Again</span></button>
+        <button class='button action-button' @click=${this.playGame}>Play <span ?hidden=${!this.isGameOver}>Again</span></button>
       </game-popup>
 
       <canvas id='game-renderer'></canvas>
@@ -240,11 +241,48 @@ export class GameShell extends LitElement {
 }
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/service-worker.js')
       console.log('ServiceWorker registration successful with scope: ', registration.scope)
-    }, function(err) {
+      
+      registration.onupdatefound = () => {
+        const appUpdateToast = document.createElement('app-update-toast')
+        document.body.appendChild(appUpdateToast)
+      }
+
+      navigator.serviceWorker.onmessage = function (evt) {
+        console.log('yo')
+        var message = JSON.parse(evt.data);
+
+    var isRefresh = message.type === 'refresh';
+    var isAsset = message.url.includes('asset');
+    var lastETag = localStorage.currentETag;
+    console.log(message)
+    // [ETag](https://en.wikipedia.org/wiki/HTTP_ETag) header usually contains
+    // the hash of the resource so it is a very effective way of check for fresh
+    // content.
+    var isNew =  lastETag !== message.eTag;
+
+    if (isRefresh && isAsset && isNew) {
+      // Escape the first time (when there is no ETag yet)
+      if (lastETag) {
+        // Inform the user about the update
+        console.log('inform about update')
+      }
+      // For teaching purposes, although this information is in the offline
+      // cache and it could be retrieved from the service worker, keeping track
+      // of the header in the `localStorage` keeps the implementation simple.
+      localStorage.currentETag = message.eTag;
+    }
+      }
+      // navigator.serviceWorker.ready.then((reload))
+      // function reload() {
+      //   location.reload()
+      // }
+  
+    } catch(err) {
       console.log('ServiceWorker registration failed: ', err)
-    })
+    }
   })
 }

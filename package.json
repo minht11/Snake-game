@@ -23,9 +23,11 @@
   "devDependencies": {
     "@types/emscripten": "0.0.31",
     "@types/web-animations-js": "^2.2.7",
+    "randomstring": "^1.1.5",
     "rollup": "^1.6.0",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-copy-glob": "^0.3.0",
+    "rollup-plugin-modify": "^3.0.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-typescript2": "^0.19.2",
     "typescript": "^3.3"

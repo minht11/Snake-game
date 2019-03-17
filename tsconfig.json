@@ -4,7 +4,7 @@
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "node",
-        "lib": ["esnext", "dom", "webworker", "scripthost", "es2016"],
+        "lib": ["esnext", "dom", "webworker", "es2016"],
         "pretty": true,
         "newLine": "LF",
         "allowSyntheticDefaultImports": true,
