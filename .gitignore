@@ -3,4 +3,4 @@
 *vscode
 *dist
 *.firebase
-*package-lock.json
+package-lock.json

@@ -3,6 +3,17 @@ import copy from 'rollup-plugin-copy-glob'
 import nodeResolve from 'rollup-plugin-node-resolve'
 import modify from 'rollup-plugin-modify'
 import randomstring from 'randomstring'
+import { terser } from 'rollup-plugin-terser'
+import minifyHTML from 'rollup-plugin-minify-html-literals'
+
+const isDevelopment = process.env.BUILD === 'development'
+
+const minify = !isDevelopment 
+? [
+  terser(),
+  minifyHTML(),
+]
+: []
 
 const mainOptions = {
   input: 'src/app.ts',
@@ -31,15 +42,15 @@ const mainOptions = {
       },
     ], {
       verbose: false, 
-      watch: true
+      watch: isDevelopment,
     }),
+    ...minify
   ],
   external: ['./game.js'],
-  experimentalCodeSplitting: true
 }
 
 const serviceWorker =  {
-  input: 'src/service-worker.ts',
+  input: 'src/service-worker/service-worker.ts',
   output: [
     {
       file: 'dist/service-worker.js',
@@ -58,6 +69,7 @@ const serviceWorker =  {
       clean: true,
       sourceMap: false,
     }),
+    ...minify
   ],
 }
 

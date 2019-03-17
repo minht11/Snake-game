@@ -92,7 +92,7 @@ class Game {
     if (snake.checkIfItCollided() || snake.checkIfOutOfBounds(columnCount, rowCount)) {
       isGameOver = true;
       EM_ASM({
-        document.getElementById('game').gameOver();
+        document.getElementById('game')['gameOver']();
       }, score);
     }
     Coordinate foodCoordinate = food.getCoordinates();
@@ -112,7 +112,7 @@ class Game {
       }
       score += 1;
       EM_ASM({
-        document.getElementById('game').setGameScore($0);
+        document.getElementById('game')['setGameScore']($0);
       }, score);
     }
   }

@@ -1,14 +1,14 @@
 {
-  "name": "genpop-app",
-  "version": "0.9.9",
-  "description": "Gen pop",
-  "main": "main.js",
+  "name": "snakee-game",
+  "version": "0.6.0",
+  "description": "Snake game written in Typescript and Wasm",
   "scripts": {
-    "start": "node ./dist/main.js",
-    "compile-wasm": "emcc src/wasm/main.cpp -s ASSERTIONS=1 -s WASM=1 -O1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
-    "server": "http-server ./dist",
-    "build": "rollup -c",
-    "watch": "rollup -cw"
+    "start": "http-server ./dist",
+    "wasm:compile-dev": "emcc src/wasm/main.cpp -s ASSERTIONS=1 -s WASM=01 -O1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
+    "wasm:compile": "emcc src/wasm/main.cpp -s -s WASM=1 -O3 --closure 1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
+    "rollup:build": "rollup -c --environment BUILD:production",
+    "rollup:watch": "rollup -cw --environment BUILD:development",
+    "build": "npm run rollup:build && npm run wasm:compile"
   },
   "keywords": [
     "Snake",
@@ -25,11 +25,11 @@
     "@types/web-animations-js": "^2.2.7",
     "randomstring": "^1.1.5",
     "rollup": "^1.6.0",
-    "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-copy-glob": "^0.3.0",
     "rollup-plugin-modify": "^3.0.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-typescript2": "^0.19.2",
+    "rollup-plugin-terser": "^4.0.4",
     "typescript": "^3.3"
   }
 }
