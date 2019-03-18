@@ -26,4 +26,8 @@ class Input : protected Keyboard, protected Touch {
   SDL_Keycode getDirection() {
     return direction;
   }
+
+  void reset() {
+    direction = SDLK_RIGHT;
+  }
 };

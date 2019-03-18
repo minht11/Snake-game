@@ -2,6 +2,12 @@
 
 class Painter {
   public:
+  ~Painter() {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+  }
+
   double screenWidth = 500;
   double screenHeight = 500;
   int zoneSize = 50;
@@ -24,12 +30,6 @@ class Painter {
       SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-  }
-
-  virtual void clearRenderer() {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
   }
 
   virtual void draw() = 0;

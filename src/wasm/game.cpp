@@ -1,7 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-
 #include <SDL2/SDL.h>
 
 #include "snake.cpp"
@@ -13,9 +9,7 @@ Snake snake;
 
 class Game : public Painter {
   private:
-
   int score = 0;
-  SDL_Keycode direction = SDLK_RIGHT;
 
   public:
   bool isInitialized = false;
@@ -25,11 +19,6 @@ class Game : public Painter {
     Painter::initialize();
     isInitialized = true;
     drawBoard();
-  }
-
-  void clearRenderer() {
-    Painter::clearRenderer();
-    isInitialized = false;
   }
 
   void resize(double w, double h) {
@@ -59,11 +48,10 @@ class Game : public Painter {
   }
 
   void changeDirection(SDL_Keycode newDirection) {
-    direction = newDirection;
+    snake.setDirection(direction);
   }
 
   void logic() {
-    snake.setDirection(direction);
     snake.move();
     if (snake.didCollideWithItself() || snake.isItOutOfBounds(columnCount, rowCount)) {
       playing = false;
@@ -146,8 +134,8 @@ class Game : public Painter {
     SDL_Rect checkboxRect;
     checkboxRect.h = zoneSize;
     checkboxRect.w = zoneSize;
-    for (size_t i = 0; i < rowCount; i++) {
-      for (size_t j = 0; j < col; j++) {
+    for (int i = 0; i < rowCount; i++) {
+      for (int j = 0; j < col; j++) {
         if (!(col * 2 > columnCount && j == col - 1 && i % 2 == 0)) {
           checkboxRect.x = 2 * j * zoneSize + (i % 2 ? 0 : zoneSize) + wallXSize;
           checkboxRect.y = i * zoneSize + wallYSize;

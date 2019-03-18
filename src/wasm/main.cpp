@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <emscripten/emscripten.h>
+#include <emscripten.h>
 
 #include "game.cpp"
 #include "input/input.cpp"
@@ -14,7 +13,6 @@ double lastFrameTime;
 void main_tick() {
   if (!game.isInitialized) {
     game.initialize();
-    emscripten_pause_main_loop();
   }
   if (!game.playing) {
     emscripten_pause_main_loop();
@@ -72,6 +70,7 @@ extern "C" {
   void playGame() {
     lastTickTime = emscripten_get_now();
     lastFrameTime = emscripten_get_now();
+    input.reset();
     game.setScene();
     game.playing = true;
     emscripten_resume_main_loop();
@@ -81,6 +80,5 @@ extern "C" {
 
 int main() {
   emscripten_set_main_loop(main_tick, 0, 1);
-  game.clearRenderer();
   return 0;
 }

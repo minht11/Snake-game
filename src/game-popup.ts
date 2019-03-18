@@ -16,14 +16,15 @@ export class GamePopup extends LitElement {
         position: absolute;
         width: 384px;
         height: fit-content;
-        padding-bottom: 36px;
-        background: #68768A;
-        border-top: 2px solid #F7630C;
+        padding-bottom: 24px;
+        background: #395174;
+        border-bottom: 24px solid #23334a;
         z-index: 3;
         margin: auto;
         left: 0;
         right: 0;
-        clip-path: polygon(20px 0%, 100% 0, 100% 100%, 100%  100%, 0 100%, 0% 20px);
+        filter: drop-shadow(0 30px 20px rgba(0,0,0,.24));
+        will-change: transform, opacity;
       }
       :host([open]) {
         display: flex;

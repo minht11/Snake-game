@@ -4,8 +4,8 @@
   "description": "Snake game written in Typescript and Wasm",
   "scripts": {
     "start": "http-server ./dist",
-    "wasm:compile-dev": "emcc src/wasm/main.cpp -s ASSERTIONS=1 -s WASM=01 -O1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
-    "wasm:compile": "emcc src/wasm/main.cpp -s -s WASM=1 -O3 --closure 1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']\" --std=c++1z",
+    "wasm:compile-dev": "emcc src/wasm/main.cpp -s ASSERTIONS=1 -s FILESYSTEM=0 -s WASM=01 -O1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']\" --std=c++1z",
+    "wasm:compile": "emcc src/wasm/main.cpp -s -s WASM=1 -O3 --closure 1 -s EXPORT_ES6=1 -s MODULARIZE=1 -s EXPORT_NAME=\"game\" -s ENVIRONMENT=\"web\" -s USE_SDL=2 -o dist/game.js -s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '_setGameMode', '_pauseGame','_resumeGame', '_playGame', '_resizeGame']\" -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']\" --std=c++1z",
     "rollup:build": "rollup -c --environment BUILD:production",
     "rollup:watch": "rollup -cw --environment BUILD:development",
     "build": "npm run rollup:build && npm run wasm:compile"

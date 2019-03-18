@@ -1,7 +1,6 @@
-#include <stdlib.h>
 #include <vector>
-
 #include <SDL2/SDL.h>
+
 #include "coordinate.cpp"
 
 class Snake {
