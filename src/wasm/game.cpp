@@ -42,13 +42,12 @@ class Game : public Painter {
 
   void setScene() {
     score = 0;
-    direction = SDLK_RIGHT;
     snake.setStartingPosition();
     food.generateNewCoordinate(columnCount-1, rowCount-1);
   }
 
   void changeDirection(SDL_Keycode newDirection) {
-    snake.setDirection(direction);
+    snake.setDirection(newDirection);
   }
 
   void logic() {
