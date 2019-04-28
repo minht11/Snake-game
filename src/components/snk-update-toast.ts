@@ -1,9 +1,8 @@
-
 import { LitElement, customElement, html, css, property } from 'lit-element'
-import { buttonStyles } from './app-styles'
+import { buttonStyles } from './styles'
 
-@customElement('app-update-toast' as any)
-export class AppUpdateToast extends LitElement {
+@customElement('snk-update-toast' as any)
+export class SnkUpdateToast extends LitElement {
   @property({ type: Boolean, reflect: true })
   open: boolean = false;
 

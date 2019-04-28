@@ -1,7 +1,7 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
-        "target": "ESNext",
+        "target": "es2017",
         "module": "ESNext",
         "moduleResolution": "node",
         "lib": ["esnext", "dom", "webworker", "es2016"],

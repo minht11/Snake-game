@@ -1,34 +1,52 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
+#include <emscripten.h>
+#include <algorithm>
+#include <cmath>
 
 #include "snake.cpp"
 #include "food.cpp"
 #include "painter.cpp"
 
-Food food;
-Snake snake;
+extern "C" {
+  extern void setupDirectionListener();
+  extern void pauseDirectionListener();
+  extern void setDirection(int);
+  extern int getDirection();
+  extern void onGameOverCallback();
+  extern void onScoreChangedCallback(int);
+}
 
 class Game : public Painter {
   private:
   int score = 0;
+  Food food;
+  Snake snake;
+  int zoneSize = 50;
+  int minimumZoneCount = 20;
+  int rowCount = 20;
+  int columnCount = 20;
+  float wallXSize = 10;
+  float wallYSize = 10;
+  float perspectiveDistance = zoneSize / 100.0 * 20;
 
   public:
-  bool isInitialized = false;
   bool playing = false;
+  bool isInitialized = false;
 
   void initialize() {
     Painter::initialize();
+    drawBoard(); 
+    setupDirectionListener();
     isInitialized = true;
-    drawBoard();
-  }
+  }  
 
-  void resize(double w, double h) {
-    screenWidth = w;
-    screenHeight = h;
+  void resize(float w, float h) {
+    Painter::resize(w, h);
     zoneSize = (w > h ? h : w) / minimumZoneCount;
   
     // Size - minimum wall size.
-    double wAdjusted = w - 10 * 2;
-    double hAdjusted = h - 10 * 2;
+    float wAdjusted = w - 10 * 2;
+    float hAdjusted = h - 10 * 2;
 
     rowCount = hAdjusted / zoneSize;
     columnCount = wAdjusted / zoneSize;
@@ -36,73 +54,62 @@ class Game : public Painter {
     wallXSize = (screenWidth - columnCount * zoneSize) / 2.0;
     wallYSize = (screenHeight - rowCount * zoneSize) / 2.0;
 
-    SDL_SetWindowSize(window, w, h);
     drawBoard();
   }
 
   void setScene() {
     score = 0;
-    snake.setStartingPosition();
+    snake.setStartingPosition(columnCount /  2, rowCount /  2);
     food.generateNewCoordinate(columnCount-1, rowCount-1);
+    setDirection(3);
+    onScoreChangedCallback(score);
   }
 
-  void changeDirection(SDL_Keycode newDirection) {
-    snake.setDirection(newDirection);
-  }
-
-  void logic() {
+  void tick() {
+    snake.setDirection(getDirection());
     snake.move();
-    if (snake.didCollideWithItself() || snake.isItOutOfBounds(columnCount, rowCount)) {
+    if (snake.didCollideWithItself() || snake.isOutOfBounds(columnCount, rowCount)) {
       playing = false;
-      EM_ASM({
-        document.getElementById('game')['gameOver']();
-      });
+      pauseDirectionListener();
+      onGameOverCallback();
+      return;
     }
     Coordinate foodCoordinate = food.getCoordinates();
     if (snake.eat(foodCoordinate)) {
       auto snakePath = snake.getCoordinates();
       foodCoordinate = food.generateNewCoordinate(columnCount-1, rowCount-1);
 
-      bool foodSpawnedBehindSnake = true;
-      while(foodSpawnedBehindSnake) {
-        for (auto & it : snakePath) {
-          if (foodCoordinate == it) {
-            foodCoordinate = food.generateNewCoordinate(columnCount-1, rowCount-1);
-            continue;
-          }
+      while(1) {
+        if(std::find(snakePath.begin(), snakePath.end(), foodCoordinate) != snakePath.end()) {
+          foodCoordinate = food.generateNewCoordinate(columnCount-1, rowCount-1);
+          continue;
         }
-        foodSpawnedBehindSnake = false;
+        break;
       }
       score += 1;
-      EM_ASM({
-        document.getElementById('game')['setGameScore']($0);
-      }, score);
+      onScoreChangedCallback(score);
     }
+    draw();
   }
 
-  int getPositionX(int coordinateX) {
+  int getDrawPositionX(int coordinateX) {
     return coordinateX * zoneSize + wallXSize;
   }
 
-  int getPositionY(int coordinateY) {
+  int getDrawPositionY(int coordinateY) {
     return coordinateY * zoneSize + wallYSize;
   }
 
   void draw() {
-    if (!playing)
-      return;
-
     drawBoard();
     drawSnake();
     drawFood();
-    
-    SDL_RenderPresent(renderer);
+    Painter::draw();
   }
 
   void drawBoard() {
-    
     // Draw solid background
-    SDL_SetRenderDrawColor(renderer, 0x08, 0x25, 0x38, 0xFF); // #082538
+    SDL_SetRenderDrawColor(renderer, 0x0a, 0x2e, 0x46, 0xFF); // #0a2e46
     SDL_RenderClear(renderer);
 
     // Draw walls
@@ -129,7 +136,7 @@ class Game : public Painter {
 
     // Draw checkboxes
     SDL_SetRenderDrawColor(renderer, 0x0a, 0x2c, 0x42, 0xFF); // #0a2c42
-    int col = round(columnCount / 2.0);
+    int col = std::round(columnCount / 2.0);
     SDL_Rect checkboxRect;
     checkboxRect.h = zoneSize;
     checkboxRect.w = zoneSize;
@@ -152,51 +159,37 @@ class Game : public Painter {
     SDL_Rect foodRect;
     foodRect.h = foodSize;
     foodRect.w = foodSize;
-    auto foodLambada = [&](bool perspective = false) -> void {
-      double distance = 0;
-      if (perspective) {
-        SDL_SetRenderDrawColor(renderer, 0x10, 0x89, 0x3E, 0xFF); // #10893E
-      } else {
-        distance = perspectiveDistance;
-        SDL_SetRenderDrawColor(renderer, 0x00, 0xCC, 0x6A, 0xFF); // #00CC6A
-      }
+    foodRect.x = getDrawPositionX(foodCoordinate.x) + foodOffset;
+    foodRect.y = getDrawPositionY(foodCoordinate.y) + foodOffset;
+    SDL_SetRenderDrawColor(renderer, 0x10, 0x89, 0x3E, 0xFF); // #10893E
+    SDL_RenderDrawRect(renderer, &foodRect);
 
-      foodRect.x = getPositionX(foodCoordinate.x) + foodOffset;
-      foodRect.y = getPositionY(foodCoordinate.y) + foodOffset - distance;
-      SDL_RenderDrawRect(renderer, &foodRect);
-    };
-    foodLambada(true);
-    foodLambada();
+    foodRect.y -= perspectiveDistance;
+    SDL_SetRenderDrawColor(renderer, 0x00, 0xCC, 0x6A, 0xFF); // #00CC6A
+    SDL_RenderDrawRect(renderer, &foodRect);
   }
 
   void drawSnake() {
     auto snakePath = snake.getCoordinates();
     SDL_Rect snakeRect;
-    snakeRect.h = zoneSize;
-    snakeRect.w = zoneSize;
-    auto snakeLambada = [&](bool perspective = false) -> void {
-      double distance = 0;
-      if (perspective) {
-        SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
-      } else {
-        distance = perspectiveDistance;
-        SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00
-      }
+    snakeRect.h = zoneSize + 2;
+    snakeRect.w = zoneSize + 2;
+    for (auto & it : snakePath) {
+      snakeRect.x = getDrawPositionX(it.x) - 1;
+      snakeRect.y = getDrawPositionY(it.y) - 1;
+      SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
+      SDL_RenderDrawRect(renderer, &snakeRect);
 
-      for (auto & it : snakePath) {
-        snakeRect.x = getPositionX(it.x);
-        snakeRect.y = getPositionY(it.y) - distance;
-        SDL_RenderDrawRect(renderer, &snakeRect);
-      };
+      snakeRect.y -= perspectiveDistance;
+      SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00
+      SDL_RenderDrawRect(renderer, &snakeRect);
     };
-    snakeLambada(true);
-    snakeLambada();
 
     // Draw snakes head
     auto snakeHeadCoord = snake.getHeadCoordinate();
     SDL_SetRenderDrawColor(renderer, 0xF7, 0x63, 0x0C, 0xFF); // #F7630C
-    snakeRect.x = getPositionX(snakeHeadCoord.x);
-    snakeRect.y = getPositionY(snakeHeadCoord.y);
+    snakeRect.x = getDrawPositionX(snakeHeadCoord.x);
+    snakeRect.y = getDrawPositionY(snakeHeadCoord.y);
     SDL_RenderFillRect(renderer, &snakeRect);
 
     SDL_SetRenderDrawColor(renderer, 0xFF, 0x8C, 0x00, 0xFF); // #FF8C00

@@ -1,10 +1,7 @@
-
 import { LitElement, customElement, html, css, property } from 'lit-element'
 
-
-@customElement('game-popup' as any)
-
-export class GamePopup extends LitElement {
+@customElement('snk-popup' as any)
+export class SnkPopup extends LitElement {
   @property({ type: Boolean, reflect: true })
   open: boolean = false;
 
@@ -14,8 +11,11 @@ export class GamePopup extends LitElement {
         display: none;
         flex-direction: column;
         position: absolute;
-        width: 384px;
-        height: fit-content;
+        width: 100%;
+        max-width: 384px;
+        height: 321px;
+        height: fit-content !important;
+        box-sizing: border-box;
         padding-bottom: 24px;
         background: #395174;
         border-bottom: 24px solid #23334a;
@@ -23,14 +23,19 @@ export class GamePopup extends LitElement {
         margin: auto;
         left: 0;
         right: 0;
+        bottom: 0;
+        top: 0;
         filter: drop-shadow(0 30px 20px rgba(0,0,0,.24));
         will-change: transform, opacity;
+        align-items: center;
       }
       :host([open]) {
         display: flex;
       }
       #header {
-        min-height: 64px;
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 112px;
         border-bottom: 1px solid rgba(255,255,255,.2);
         color: #fff;
         display: flex;
@@ -38,13 +43,7 @@ export class GamePopup extends LitElement {
         justify-content: center;
         align-items: center;
         padding: 24px;
-        margin-bottom: 24px;
-      }
-      ::slotted([slot='popup-title']) {
-        font-size: 40px;
-      }
-      ::slotted([slot='popup-header']) {
-        font-size: 20px;
+        margin-bottom: 16px;
       }
     `]
   }

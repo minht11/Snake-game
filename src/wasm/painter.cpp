@@ -1,24 +1,11 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 class Painter {
-  public:
-  ~Painter() {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-  }
-
-  double screenWidth = 500;
-  double screenHeight = 500;
-  int zoneSize = 50;
-  int minimumZoneCount = 20;
-  int rowCount = 20;
-  int columnCount = 20;
-  double wallXSize = 10;
-  double wallYSize = 10;
-  double perspectiveDistance = zoneSize / 100.0 * 20;
-  SDL_Window *window = NULL;
-  SDL_Renderer *renderer = NULL;
+  protected:
+  float screenWidth = 500;
+  float screenHeight = 500;
+  SDL_Window *window = nullptr;
+  SDL_Renderer *renderer = nullptr;
 
   virtual void initialize() {
     SDL_Init(SDL_INIT_VIDEO);
@@ -27,12 +14,18 @@ class Painter {
       "Snakee",
       SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
       screenWidth, screenHeight,
-      SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
+      SDL_WINDOW_OPENGL);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
   }
 
-  virtual void draw() = 0;
- 
-};
+  virtual void resize(float w, float h) {
+    screenWidth = w;
+    screenHeight = h;
+    SDL_SetWindowSize(window, w, h);
+  }
 
+  virtual void draw() {
+    SDL_RenderPresent(renderer);
+  };
+};

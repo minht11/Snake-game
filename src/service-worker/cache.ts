@@ -2,8 +2,7 @@ export const precacheConfig = [
   ['index.html', 'sw_hash_replacement'],
   ['manifest.json', 'sw_hash_replacement'],
   ['app.js', 'sw_hash_replacement'],
-  ['game.js', 'sw_hash_replacement'],
-  ['game.wasm', 'sw_hash_replacement'],
+  ['wasm-game.wasm', 'sw_hash_replacement'],
   ['images/favicon.ico', 'sw_hash_replacement'],
 ]
 

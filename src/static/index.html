@@ -6,18 +6,13 @@
     <meta name='theme-color' content='#071d2b'>
     <meta name='description' content='Snake game'>
     <link rel='manifest' href='/manifest.json'>
-    <meta http-equiv='Content-Security-Policy'
-        content="default-src 'self' https: 'unsafe-inline';
-        script-src 'self' 'unsafe-eval';
-        style-src 'unsafe-inline' http: https:;
-        media-src 'unsafe-inline' http: file:;"/>
+
     <link rel='shortcut icon' href='./images/favicon.ico' sizes='256x256' />
     <style>
       html {
         overflow: hidden;
         background: #082538;
       }
-
       body {
         margin: 0;
         user-select: none;
@@ -36,9 +31,22 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        top: 0;
+        transition: opacity .4s, transform .4s;
+      }
+      #splash-screen[animation] {
+        opacity: 0;
+        transform: scale(1.2);
+      }
+      #splash-screen[hidden] {
+        display: none;
+      }
+      #splash-content {
+        display: flex;
+        flex-direction: column;
       }
       #splash-title {
-        font-size: 24px;
+        font-size: 64px;
         color: #fff;
       }
       #splash-snake {
@@ -46,21 +54,85 @@
         width: 100px;
         background: #FF8C00;
       }
-      html[loaded] #splash-screen {
-        display: none;
+      #splash-loading-snake {
+        stroke:#FF8C00;;
+        fill: transparent;
+        height: 52px;
+        width: 52px;
+        margin: auto;
+      }
+      #splash-snake-head {
+        fill:  #FF8C00;
+        stroke: #FF8C00;;
       }
     </style>
-    <script type='module' src='./app.js' async></script>
     <link href='https://fonts.googleapis.com/css?family=Josefin+Sans' rel='stylesheet'>
   <body>
 
     <div id='splash-screen'>
-      <div>
-        <div id='splash-title'>Loading game</div>
-        <div id='splash-snake'></div>
+      <div id='splash-content'>
+        <div id='splash-title'>Snakee</div>
+        <svg id='splash-loading-snake' xmlns='http://www.w3.org/2000/svg'>
+          <rect x='0' y='0' width='17' height='17'></rect>
+          <rect x='17' y='0' width='17' height='17'></rect>
+          <rect x='34' y='0' width='17' height='17'></rect>
+
+          <rect x='34' y='17' width='17' height='17'></rect>
+          <rect x='34' y='34' width='17' height='17'></rect>
+          <rect id='splash-snake-head' x='17' y='34' width='17' height='17'></rect>
+        </svg>
       </div>
     </div>
 
-    <game-shell id='game'></game-shell>
+    <snk-shell id='game'></snk-shell>
+    <script type='module'>
+      const snake = document.getElementById('splash-loading-snake').children
+      const coordinates = [
+        { x: 0, y: 0 },
+        { x: 17, y: 0 },
+        { x: 34, y: 0 },
+        { x: 34, y: 17 },
+        { x: 34, y: 34 },
+        { x: 17, y: 34 },
+        { x: 0, y: 34 },
+        { x: 0, y: 17 },
+      ]
+      let firstLoop = true
+      const animateSnake = () => {
+        for (let i = 0; i < snake.length; i += 1) {
+          const part = snake[i]
+          if (firstLoop) {
+            part.index = i
+          }
+          if (part.index > 6) {
+            part.index = 0 
+          } else {
+            part.index += 1
+          }
+          const coordinate = coordinates[part.index]
+          part.setAttribute('x', coordinate.x)
+          part.setAttribute('y', coordinate.y)
+        }
+        firstLoop = false
+      }
+      const interval = setInterval(animateSnake, 16 * 8)
+      document.addEventListener('app-loaded', () => {
+        const splashElement = document.getElementById('splash-screen')
+        splashElement.setAttribute('animation', '')
+        setTimeout(() => {
+          clearInterval(interval)
+          splashElement.setAttribute('hidden', '')
+        }, 500)
+      }, { once: true })
+    </script>
+    <script nomodule>
+      document.addEventListener('app-loaded', function() {
+        document.getElementById('splash-screen').setAttribute('hidden', '');
+      });
+    </script>
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script type='module' src='./app.js'></script>
+    <script nomodule src='./wasm-game-asm.js'></script>
+    <script nomodule src='./app-es5.js'></script>
   </body>
 </html>

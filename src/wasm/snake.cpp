@@ -1,36 +1,34 @@
 #include <vector>
-#include <SDL2/SDL.h>
-
 #include "coordinate.cpp"
 
 class Snake {
   private:
   std::vector<Coordinate> path;
   bool needsToGrow;
-  SDL_Keycode direction;
+  int direction = 3;
 
   public:
-  Coordinate getHeadCoordinate() {
+  const Coordinate getHeadCoordinate() {
     return path.back();
   }
 
-  std::vector<Coordinate> getCoordinates() {
+  const std::vector<Coordinate>& getCoordinates() {
     return path;
   }
 
-  void setStartingPosition() {
-    Coordinate startingCoordinate{.x = 5, .y = 5 };
+  void setStartingPosition(int x, int y) {
     path.clear();
-    path.push_back(startingCoordinate);
+    path.push_back(Coordinate {.x = x - 1, .y = y });
+    path.push_back(Coordinate {.x = x, .y = y });
     needsToGrow = false;
   }
 
-  void setDirection(SDL_Keycode newDirection) {
-     if ((path.size() > 1) && 
-       ((direction == SDLK_UP && newDirection == SDLK_DOWN) ||
-        (direction == SDLK_DOWN && newDirection == SDLK_UP) ||
-        (direction == SDLK_LEFT && newDirection == SDLK_RIGHT) ||
-        (direction == SDLK_RIGHT && newDirection == SDLK_LEFT))) {
+  void setDirection(int newDirection) {
+     if (newDirection > -1 && newDirection < 4 && 
+       ((direction == 0 && newDirection == 2) ||
+        (direction == 2 && newDirection == 0) ||
+        (direction == 1 && newDirection == 3) ||
+        (direction == 3 && newDirection == 1))) {
           return;
     }
     direction = newDirection;
@@ -41,19 +39,19 @@ class Snake {
     Coordinate newHeadCoordinate;
 
     switch(direction) {
-      case SDLK_LEFT:
+      case 1: // Left
         newHeadCoordinate.x = headCoordinate.x - 1;
         newHeadCoordinate.y = headCoordinate.y;
         break;
-      case SDLK_RIGHT:
+      case 3: // Right
         newHeadCoordinate.x = headCoordinate.x + 1;
         newHeadCoordinate.y = headCoordinate.y;
         break;
-      case SDLK_UP:
+      case 0: // Top
         newHeadCoordinate.x = headCoordinate.x;
         newHeadCoordinate.y = headCoordinate.y - 1;
         break;
-      case SDLK_DOWN:
+      case 2: // Bottom
         newHeadCoordinate.x = headCoordinate.x;
         newHeadCoordinate.y = headCoordinate.y + 1;
         break;
@@ -75,14 +73,12 @@ class Snake {
   }
 
   bool didCollideWithItself() {
-    if (path.size() == 1)
-      return false;
-
     Coordinate headCoordinate = getHeadCoordinate();
     int i = 0;
     int size = path.size();
+    
     for (auto & it : path) {
-      if (it == headCoordinate && size-1 != i) {
+      if (it == headCoordinate && size - 1 != i) {
         return true;
       }
       i += 1;
@@ -90,9 +86,9 @@ class Snake {
     return false;
   }
 
-  bool isItOutOfBounds(int boundaryX, int boundaryY) {
+  bool isOutOfBounds(int boundaryX, int boundaryY) {
     Coordinate headCoordinate = getHeadCoordinate();
-    return headCoordinate.x == -1 || headCoordinate.y == -1 ||
-          headCoordinate.x == boundaryX || headCoordinate.y == boundaryY;
+    return headCoordinate.x < 0 || headCoordinate.y < 0 ||
+      headCoordinate.x >= boundaryX || headCoordinate.y >= boundaryY;
   }
 };

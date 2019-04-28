@@ -4,3 +4,4 @@
 *dist
 *.firebase
 *package-lock.json
+*src/wasm-game.js

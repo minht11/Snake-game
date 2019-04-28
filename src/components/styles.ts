@@ -1,8 +1,14 @@
 import { css } from 'lit-element'
 
-export const appStyles = [css`
+export const shellStyles = [css`
 :host {
   display: contents;
+}
+#game-renderer {
+  transition: opacity .4s;
+}
+#game-renderer[faded] {
+  opacity: .6;
 }
 #app-bar {
   display: flex;
@@ -18,7 +24,10 @@ export const appStyles = [css`
   box-sizing: border-box;
   font-size: 14px;
 }
-#header-game-mode-name {
+#score-info {
+  margin-right: auto;
+}
+#header-game-speed-name {
   font-size: 18px;
   text-transform: capitalize;
   margin-right: 24px;
@@ -39,14 +48,18 @@ export const appStyles = [css`
   font-size: 18px;
   left: 0;
   right: 0;
+  width: 100px;
   width: max-content;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
 }
 
 .icon-button {
   height: 40px;
   width: 40px;
   border-radius: 50%;
-  margin-left: auto;
   cursor: pointer;
   border: none;
   padding: 0;
@@ -55,30 +68,49 @@ export const appStyles = [css`
   justify-content: center;
   align-items: center;
 }
+.icon-button a {
+  cursor: pointer;
+}
 .icon-button svg {
-  height: 30px;
-  width: 30px;
+  height: 24px;
+  width: 24px;
   fill: #fff;
 }
-
-#game-mode-selector {
-  display: flex;
-  margin: 0 auto 24px;
-  border: 1px solid rgba(255,255,255,.5);
+.icon-button.pause svg {
+  height: 30px;
+  width: 30px;
 }
 
-#game-mode-selector input {
+.content-sizing-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+#game-speed-selector {
+  display: flex;
+  border: 1px solid rgba(255,255,255,.5);
+  margin: 16px 0 24px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+#game-speed-selector input {
   display: none;
 }
-#game-mode-selector label {
+#game-speed-selector label {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 40px;
   width: 96px;
   box-sizing: border-box;
-  color: #fff;
   margin: -1px;
+  cursor: pointer;
+  transition: background-color .12s;
+}
+#game-speed-selector label:hover {
+  background-color: rgba(255, 255, 255, .1);
 }
 input[type=radio]:checked ~ label {
   border: 2px solid #0DFF92;
@@ -87,12 +119,14 @@ input[type=radio]:checked ~ label {
 
 .action-button {
   font-size: 14px;
+  color: rgba(0, 0, 0, 0.87);
   background: #FF8C00;
   border-bottom: 2px solid #F7630C;
   height: 48px;
   padding: 0 36px;
   text-transform: uppercase;
   font-weight: 600;
+  width: 100%;
 }
 .action-button:hover {
   border-bottom: 2px solid #FF8C00;
@@ -103,6 +137,15 @@ input[type=radio]:checked ~ label {
   width: 100%;
   height: calc(100% - 56px);
   box-sizing: border-box;
+}
+
+#game-paused-popup {
+  height: 224px;
+}
+
+#game-paused-popup .action-button {
+  margin: 0 24px;
+  width: auto;
 }
 
 #resume-game-countdown-container {
@@ -159,7 +202,13 @@ input[type=radio]:checked ~ label {
 
 [hidden] {
   display: none;
-} 
+}
+.popup-title {
+  font-size: 40px;
+}
+.popup-header {
+  font-size: 20px;
+}
 `]
 
 export const buttonStyles = css`
