@@ -16,7 +16,7 @@ export const shellStyles = [css`
   position: relative;
   height: 56px;
   width: 100%;
-  background: #0d344e;
+  background: #07263A;
   color: #fff;
   fill: #fff;
   flex-shrink: 0;

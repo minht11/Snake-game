@@ -29,7 +29,10 @@ const mainPlugins = [
 ]
 
 const mainBundle  = {
-  input: 'src/app.ts',
+  input: [
+    'src/app.ts',
+    'src/service-worker/service-worker.ts',
+  ],
   output: [
     {
       dir: 'dist/',
@@ -40,6 +43,10 @@ const mainBundle  = {
   plugins: [
     ...mainPlugins,
     ...minify,
+    modify({
+      find: 'sw_hash_replacement',
+      replace: () => randomstring.generate()
+    }),
     copy({
       targets: {
         'src/static/': 'dist'
@@ -69,32 +76,7 @@ const mainBundleES5 = {
   ],
 }
 
-const serviceWorker =  {
-  input: 'src/service-worker/service-worker.ts',
-  output: [
-    {
-      file: 'dist/service-worker.js',
-      format: 'es',
-      sourcemap: false
-    },
-  ],
-  plugins: [
-    modify({
-      find: 'sw_hash_replacement',
-      replace: () => randomstring.generate()
-    }),
-    typescript({
-      typescript: require("typescript"),
-      verbosity: 2,
-      clean: true,
-      sourceMap: false,
-    }),
-    ...minify
-  ],
-}
-
 export default [
   mainBundle,
   mainBundleES5,
-  serviceWorker,
 ]

@@ -113,7 +113,7 @@ class Game : public Painter {
     SDL_RenderClear(renderer);
 
     // Draw walls
-    SDL_SetRenderDrawColor(renderer, 0x04, 0x14, 0x1f, 0xFF); // #04141f
+    SDL_SetRenderDrawColor(renderer, 0x07, 0x26, 0x3A, 0xFF); // #07263A
     SDL_Rect wallRect;
     // Left
     wallRect.w = wallXSize;
@@ -133,22 +133,6 @@ class Game : public Painter {
     // Bottom
     wallRect.y = screenHeight - wallYSize;
     SDL_RenderFillRect(renderer, &wallRect);
-
-    // Draw checkboxes
-    SDL_SetRenderDrawColor(renderer, 0x0a, 0x2c, 0x42, 0xFF); // #0a2c42
-    int col = std::round(columnCount / 2.0);
-    SDL_Rect checkboxRect;
-    checkboxRect.h = zoneSize;
-    checkboxRect.w = zoneSize;
-    for (int i = 0; i < rowCount; i++) {
-      for (int j = 0; j < col; j++) {
-        if (!(col * 2 > columnCount && j == col - 1 && i % 2 == 0)) {
-          checkboxRect.x = 2 * j * zoneSize + (i % 2 ? 0 : zoneSize) + wallXSize;
-          checkboxRect.y = i * zoneSize + wallYSize;
-          SDL_RenderFillRect(renderer, &checkboxRect);
-        }
-      }
-    }
   }
 
   void drawFood() {

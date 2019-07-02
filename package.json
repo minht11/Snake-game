@@ -1,12 +1,11 @@
 {
   "name": "snakee-game",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Snake game written in Typescript and Wasm",
   "scripts": {
     "start": "http-server ./dist",
     "rollup:build": "rollup -c --environment BUILD:production",
-    "rollup:watch": "rollup -cw --environment BUILD:development",
-    "build": "npm run rollup:build && npm run wasm:compile"
+    "rollup:watch": "rollup -cw --environment BUILD:development"
   },
   "keywords": [
     "Snake",
@@ -16,7 +15,7 @@
     "TypeScript",
     "JavaScript"
   ],
-  "author": "Justinas Delinda",
+  "author": "minht11",
   "license": "MIT",
   "dependencies": {
     "lit-element": "^2.0.1"
@@ -27,7 +26,7 @@
     "@babel/preset-env": "^7.4.3",
     "@types/web-animations-js": "^2.2.7",
     "randomstring": "^1.1.5",
-    "rollup": "^1.10.0",
+    "rollup": "^1.13.1",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-copy": "^1.1.0",
     "rollup-plugin-minify-html-literals": "^1.2.2",

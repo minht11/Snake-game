@@ -5,3 +5,4 @@
 *.firebase
 *package-lock.json
 *src/wasm-game.js
+*emsdk_set_env.sh
